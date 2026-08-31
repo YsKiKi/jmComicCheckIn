@@ -1,0 +1,44 @@
+name: JM Check-in
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate config
+        run: |
+          cat > config.yml <<'EOF'
+          accounts:
+            - name: default
+              username: "${JM_USERNAME}"
+              password: "${JM_PASSWORD}"
+          schedule:
+            time: "08:00"
+            timezone: "Asia/Shanghai"
+            run_on_start: true
+          notify:
+            - type: pushplus
+              token: "${PUSHPLUS_TOKEN}"
+          EOF
+        env:
+          JM_USERNAME: ${{ secrets.JM_USERNAME }}
+          JM_PASSWORD: ${{ secrets.JM_PASSWORD }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN || '' }}
+
+      - name: Run check-in
+        run: python run.py --once
