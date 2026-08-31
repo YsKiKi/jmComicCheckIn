@@ -9,6 +9,7 @@
   - 查询签到: GET  /daily?user_id={uid}
   - 执行签到: POST /daily_chk  (form: user_id, daily_id)
 """
+
 from __future__ import annotations
 
 import datetime as dt
@@ -17,7 +18,19 @@ from typing import Any, Dict, Optional
 
 from jmcomic import JmOption, create_option_by_file
 
-logger = logging.getLogger('jmcheckin.client')
+logger = logging.getLogger("jmcheckin.client")
+
+
+def mask_uid(value: Any) -> str:
+    """通过uid位数进行掩藏"""
+    s = str(value).strip()
+    if not s:
+        return s
+    if len(s) <= 2:
+        return "*" * len(s)
+    if len(s) <= 6:
+        return s[0] + "*" * (len(s) - 2) + s[-1]
+    return s[:2] + "*" * (len(s) - 4) + s[-2:]
 
 
 class JMCheckinError(Exception):
@@ -32,23 +45,23 @@ class JMCheckinClient:
             self.option = create_option_by_file(option_file)
         else:
             # 默认配置 + 关闭 jmcomic 内部日志，保持服务日志干净
-            self.option = JmOption.construct({'log': False})
+            self.option = JmOption.construct({"log": False})
         # 使用移动端 api 实现：兼容性好，自带接口加解密
-        self.client = self.option.build_jm_client(impl='api')
+        self.client = self.option.build_jm_client(impl="api")
         self.uid: Optional[str] = None
 
     def login(self, username: str, password: str) -> Dict[str, Any]:
         resp = self.client.login(username, password)
         data: Dict[str, Any] = resp.res_data
-        uid = data.get('uid')
+        uid = data.get("uid")
         if uid is None:
-            raise JMCheckinError('登录响应中缺少 uid，登录失败')
+            raise JMCheckinError("登录响应中缺少 uid，登录失败")
         self.uid = str(uid)
-        logger.info('账号 %s 登录成功 (uid=%s)', username, self.uid)
+        logger.info("账号 %s 登录成功 (uid=%s)", username, mask_uid(self.uid))
         return data
 
     def get_daily(self) -> Dict[str, Any]:
-        resp = self.client.req_api(f'/daily?user_id={self.uid}')
+        resp = self.client.req_api(f"/daily?user_id={self.uid}")
         return resp.res_data
 
     @staticmethod
@@ -58,46 +71,46 @@ class JMCheckinClient:
         record 为当月签到日历: [[{date: 日, signed: bool}, ...], ...]
         """
         today = dt.date.today().day
-        if data.get('signed') is True:
+        if data.get("signed") is True:
             return True
-        for group in data.get('record') or []:
+        for group in data.get("record") or []:
             for item in group or []:
                 if not isinstance(item, dict):
                     continue
                 try:
-                    day = int(item.get('date'))
+                    day = int(item.get("date"))
                 except (TypeError, ValueError):
                     continue
                 if day == today:
-                    return bool(item.get('signed'))
+                    return bool(item.get("signed"))
         return False
 
     def check_in(self) -> Dict[str, Any]:
         daily = self.get_daily()
-        daily_id = daily.get('daily_id')
+        daily_id = daily.get("daily_id")
 
         if self.is_signed_today(daily):
-            logger.info('今日已签到，无需重复签到')
-            return {'status': 'already', 'detail': daily}
+            logger.info("今日已签到，无需重复签到")
+            return {"status": "already", "detail": daily}
 
         if not daily_id:
-            raise JMCheckinError('未获取到 daily_id，无法签到')
+            raise JMCheckinError("未获取到 daily_id，无法签到")
 
         resp = self.client.req_api(
-            '/daily_chk',
+            "/daily_chk",
             get=False,
             require_success=False,
-            data={'user_id': self.uid, 'daily_id': daily_id},
+            data={"user_id": self.uid, "daily_id": daily_id},
         )
 
         if not resp.is_success:
-            msg = ''
+            msg = ""
             try:
-                msg = str(resp.res_data.get('msg', ''))
+                msg = str(resp.res_data.get("msg", ""))
             except Exception:
                 pass
-            raise JMCheckinError(f'签到接口返回异常: {msg or resp.text[:200]}')
+            raise JMCheckinError(f"签到接口返回异常: {msg or resp.text[:200]}")
 
         data: Dict[str, Any] = resp.res_data
-        logger.info('签到成功: %s', data.get('msg', ''))
-        return {'status': 'ok', 'msg': data.get('msg', ''), 'detail': data}
+        logger.info("签到成功: %s", data.get("msg", ""))
+        return {"status": "ok", "msg": data.get("msg", ""), "detail": data}
