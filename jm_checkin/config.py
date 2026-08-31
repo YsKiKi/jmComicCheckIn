@@ -1,6 +1,7 @@
 """加载与校验 config.yml 配置"""
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
@@ -8,6 +9,8 @@ from pathlib import Path
 from typing import Any, List, Optional
 
 import yaml
+
+logger = logging.getLogger('jmcheckin.config')
 
 _ENV_PATTERN = re.compile(r'\$\{([A-Za-z_][A-Za-z0-9_]*)\}')
 
@@ -27,6 +30,19 @@ def _substitute_env(value: Any) -> Any:
     if isinstance(value, list):
         return [_substitute_env(v) for v in value]
     return value
+
+
+def _collect_unresolved(value: Any, path: str, out: List[str]):
+    """收集替换后仍未解析的 ${VAR} 占位符，避免把字面量当作真实值使用"""
+    if isinstance(value, str):
+        for m in _ENV_PATTERN.finditer(value):
+            out.append(f'{path}: {m.group(0)}' if path else m.group(0))
+    elif isinstance(value, dict):
+        for k, v in value.items():
+            _collect_unresolved(v, f'{path}.{k}' if path else str(k), out)
+    elif isinstance(value, list):
+        for i, v in enumerate(value):
+            _collect_unresolved(v, f'{path}[{i}]', out)
 
 
 @dataclass
@@ -90,6 +106,16 @@ def load_config(path) -> Config:
 
     raw = _substitute_env(raw)
 
+    # 快速失败：环境变量缺失时直接报错，而不是把 ${VAR} 字面量发给服务器
+    unresolved: List[str] = []
+    _collect_unresolved(raw, '', unresolved)
+    if unresolved:
+        raise ConfigError(
+            '以下环境变量占位符未解析，请设置对应环境变量'
+            '（GitHub Actions 中请检查仓库 Secrets 配置）: '
+            + ', '.join(unresolved)
+        )
+
     accounts_raw = raw.get('accounts') or []
     if not accounts_raw:
         raise ConfigError('配置中缺少 accounts，请至少填写一个账号')
@@ -124,12 +150,23 @@ def load_config(path) -> Config:
         ntype = str(item.get('type', '')).strip().lower()
         if not ntype:
             raise ConfigError('notify 项缺少 type')
-        cfg.notifiers.append(Notifier(
+        notifier = Notifier(
             type=ntype,
-            token=str(item.get('token', '')),
-            sendkey=str(item.get('sendkey', '')),
-            url=str(item.get('url', '')),
-        ))
+            token=str(item.get('token', '')).strip(),
+            sendkey=str(item.get('sendkey', '')).strip(),
+            url=str(item.get('url', '')).strip(),
+        )
+        # 缺少凭证的渠道直接跳过，避免空 token 造成的无效请求
+        if ntype == 'pushplus' and not notifier.token:
+            logger.warning('pushplus 未配置 token，已跳过该通知渠道')
+            continue
+        if ntype == 'serverchan' and not notifier.sendkey:
+            logger.warning('serverchan 未配置 sendkey，已跳过该通知渠道')
+            continue
+        if ntype == 'webhook' and not notifier.url:
+            logger.warning('webhook 未配置 url，已跳过该通知渠道')
+            continue
+        cfg.notifiers.append(notifier)
 
     if raw.get('option_file'):
         cfg.option_file = str(raw['option_file'])
