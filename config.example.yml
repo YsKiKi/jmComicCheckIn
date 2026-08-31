@@ -1,0 +1,36 @@
+# ============================================================
+# 禁漫天堂自动签到配置
+# 使用方法：复制本文件为 config.yml，填写你的账号后运行
+# ============================================================
+
+# 账号列表，支持多账号
+accounts:
+  - name: 主账号              # 可选，用于日志与通知中的标识
+    username: your_username   # 禁漫天堂用户名
+    password: "${JM_PASSWORD}" # 密码；支持 ${环境变量} 占位，建议密码放环境变量
+
+# 定时设置（常驻模式 run.py 使用；--once 模式忽略）
+schedule:
+  time: "08:00"               # 每天签到时间，24 小时制
+  timezone: "Asia/Shanghai"   # 时区（IANA 名称），默认北京时间
+  jitter_seconds: 300         # 随机延迟 0~300 秒后再签到，避免过于规律
+  run_on_start: true          # 服务启动时立即签到一次
+  retry_interval_minutes: 30  # 签到失败后的重试间隔（分钟）
+  max_retries: 2              # 失败后最多重试次数
+
+# 可选：签到结果通知（不配置则不推送）
+notify:
+  # PushPlus：https://www.pushplus.plus
+  # - type: pushplus
+  #   token: "你的pushplus token"
+  #
+  # Server酱：https://sct.ftqq.com
+  # - type: serverchan
+  #   sendkey: "你的sendkey"
+  #
+  # 通用 Webhook（POST JSON: {title, content}）
+  # - type: webhook
+  #   url: "https://your-webhook.example.com/..."
+
+# 可选：jmcomic 高级配置文件（自定义代理、域名、headers 等）
+# option_file: "./jm_option.yml"

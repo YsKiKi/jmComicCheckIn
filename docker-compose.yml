@@ -1,0 +1,9 @@
+services:
+  jm-checkin:
+    build: .
+    container_name: jm-checkin
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./config.yml:/config/config.yml:ro

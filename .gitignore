@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.log
+.git
+.github
+config.yml
+config.local.yml
+.venv
+venv
+.env
