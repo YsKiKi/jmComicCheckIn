@@ -13,7 +13,7 @@ accounts:
 schedule:
   time: "08:00"               # 每天签到时间，24 小时制
   timezone: "Asia/Shanghai"   # 时区（IANA 名称），默认北京时间
-  jitter_seconds: 300         # 随机延迟 0~300 秒后再签到，避免过于规律
+  jitter_seconds: 300         # 随机延迟 0~300 秒后再签到
   run_on_start: true          # 服务启动时立即签到一次
   retry_interval_minutes: 30  # 签到失败后的重试间隔（分钟）
   max_retries: 2              # 失败后最多重试次数

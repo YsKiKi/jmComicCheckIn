@@ -33,7 +33,7 @@ def _substitute_env(value: Any) -> Any:
 
 
 def _collect_unresolved(value: Any, path: str, out: List[str]):
-    """收集替换后仍未解析的 ${VAR} 占位符，避免把字面量当作真实值使用"""
+    """收集仍未解析的 ${VAR} 占位符"""
     if isinstance(value, str):
         for m in _ENV_PATTERN.finditer(value):
             out.append(f'{path}: {m.group(0)}' if path else m.group(0))
@@ -106,7 +106,7 @@ def load_config(path) -> Config:
 
     raw = _substitute_env(raw)
 
-    # 快速失败：环境变量缺失时直接报错，而不是把 ${VAR} 字面量发给服务器
+    # 快速失败：环境变量缺失时直接报错
     unresolved: List[str] = []
     _collect_unresolved(raw, '', unresolved)
     if unresolved:
@@ -156,7 +156,7 @@ def load_config(path) -> Config:
             sendkey=str(item.get('sendkey', '')).strip(),
             url=str(item.get('url', '')).strip(),
         )
-        # 缺少凭证的渠道直接跳过，避免空 token 造成的无效请求
+        # 缺少凭证的渠道直接跳过
         if ntype == 'pushplus' and not notifier.token:
             logger.warning('pushplus 未配置 token，已跳过该通知渠道')
             continue

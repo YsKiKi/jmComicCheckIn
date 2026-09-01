@@ -1,14 +1,4 @@
-"""禁漫签到客户端
-
-基于 jmcomic 库（hect0x7/JMComic-Crawler-Python）的移动端 API 客户端：
-  - 自动处理 APP 接口 token / tokenparam 加解密
-  - 自动更新最新 API 域名、自动携带 cookies，无需对抗 Cloudflare
-
-签到接口路径参考 tonquer/JMComic-qt 客户端实现：
-  - 登录:     POST /login
-  - 查询签到: GET  /daily?user_id={uid}
-  - 执行签到: POST /daily_chk  (form: user_id, daily_id)
-"""
+"""禁漫签到客户端"""
 
 from __future__ import annotations
 
@@ -44,9 +34,9 @@ class JMCheckinClient:
         if option_file:
             self.option = create_option_by_file(option_file)
         else:
-            # 默认配置 + 关闭 jmcomic 内部日志，保持服务日志干净
+            # 默认配置，关闭 jmcomic 内部日志
             self.option = JmOption.construct({"log": False})
-        # 使用移动端 api 实现：兼容性好，自带接口加解密
+        # 使用移动端 api 实现
         self.client = self.option.build_jm_client(impl="api")
         self.uid: Optional[str] = None
 
