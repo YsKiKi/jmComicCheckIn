@@ -1,4 +1,4 @@
 jmcomic>=2.7.5
-PyYAML>=6.0
+PyYAML>=6.0.3
 requests>=2.34.2
 tzdata>=2026.3; platform_system == "Windows"
