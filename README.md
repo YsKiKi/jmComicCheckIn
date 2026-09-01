@@ -98,9 +98,19 @@ python run.py --once
 ## 🐳 部署
 
 ### Docker / Docker Compose
-拉取项目后，在项目根目录执行：
+
+拉取项目后，先复制示例配置并填写账号（`docker-compose.yml` 会把根目录的 `config.yml` 挂载进容器，缺少该文件无法启动）：
+
 ```bash
-docker compose up -d
+copy config.example.yml config.yml   # Windows
+# cp config.example.yml config.yml   # Linux / macOS
+# 编辑 config.yml，填写 username / password
+```
+
+然后在项目根目录执行：
+
+```bash
+docker compose up -d    # 常驻模式，每天自动签到
 ```
 
 ### Windows 任务计划程序
