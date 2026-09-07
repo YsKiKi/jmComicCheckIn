@@ -4,7 +4,7 @@
 
 每天自动登录禁漫天堂并完成打卡签到，支持多账号、定时执行、失败重试与多渠道通知。
 
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=flat)
 [![GitHub Repo stars](https://img.shields.io/github/stars/YsKiKi/jmComicCheckIn?style=flat&color=yellow)](https://github.com/YsKiKi/jmComicCheckIn)
@@ -70,6 +70,9 @@ cp config.example.yml config.yml
 > 配置项说明见文件内注释，或下方折叠区「使用与配置」。
 
 #### Python 直接运行
+> [!NOTE]
+> 需要 **Python 3.10+**，建议使用 **Python 3.14**。
+
 ```bash
 pip install -r requirements.txt
 python run.py --once     # 单次签到后退出，用于验证

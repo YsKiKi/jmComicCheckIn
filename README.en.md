@@ -4,7 +4,7 @@
 
 Automatically logs in to JMComic (禁漫天堂) and completes the daily check-in. Supports multiple accounts, scheduled execution, retry on failure, and multi-channel notifications.
 
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=flat)
 [![GitHub Repo stars](https://img.shields.io/github/stars/YsKiKi/jmComicCheckIn?style=flat&color=yellow)](https://github.com/YsKiKi/jmComicCheckIn)
@@ -70,6 +70,9 @@ Edit `config.yml` and fill in your account and password.
 > See the in-file comments for each config option, or the collapsible "Usage & Configuration" section below.
 
 #### Run with Python
+> [!NOTE]
+> Requires **Python 3.10+**, Python **3.14 recommended**.
+
 ```bash
 pip install -r requirements.txt
 python run.py --once     # Check in once and exit, for verification

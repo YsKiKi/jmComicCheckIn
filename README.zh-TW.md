@@ -4,7 +4,7 @@
 
 每天自動登入禁漫天堂並完成打卡簽到，支援多帳號、定時執行、失敗重試與多管道通知。
 
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=flat)
 [![GitHub Repo stars](https://img.shields.io/github/stars/YsKiKi/jmComicCheckIn?style=flat&color=yellow)](https://github.com/YsKiKi/jmComicCheckIn)
@@ -70,6 +70,9 @@ cp config.example.yml config.yml
 > 設定項目說明見檔案內註解，或下方摺疊區「使用與設定」。
 
 #### Python 直接執行
+> [!NOTE]
+> 需 **Python 3.10+**，建議使用 **Python 3.14**。
+
 ```bash
 pip install -r requirements.txt
 python run.py --once     # 單次簽到後退出，用於驗證
