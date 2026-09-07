@@ -13,6 +13,8 @@
 
 </div>
 
+**语言 / Language:** [简体中文](./README.md) | [繁體中文](./README.zh-TW.md) | [English](./README.en.md)
+
 ## ✨ 功能特性
 
 - ✅ 每日自动登录并完成打卡签到，常驻模式下失败自动重试
